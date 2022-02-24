@@ -1,11 +1,11 @@
+<!-- Header -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Inscription form</title>
-	<link rel="stylesheet" href="form.css">
-</head>
-	<body>
-        <?php include "process.php"?>
+	<meta name="description" content="Server-side registration">
+  	<meta name="keywords" content="HTML, CSS, PHP">
+  	<meta name="author" content="Loick Cherimont">
+	<title>Registration</title>
