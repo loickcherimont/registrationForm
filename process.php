@@ -1,91 +1,93 @@
 <?php
-//Errors
+// No error at the beginning
 $errors = [
     'username' => "",
     'email' => "",
     'password' => "",
     'conf_password' => "",
-    'box' => ""
+    'tos' => ""
 ];
 
-// if form is submitted
-if(isset($_GET['submit'])) {
+// Submission
+if(isset($_POST) && !empty($_POST)) {
 
-    //CHECKBOX
-    // Verify if checkbox is checked?
-    $box = filter_input(INPUT_GET, 'box', FILTER_SANITIZE_STRING);
+    $TOS = $_POST['tos'] ?? '';
 
-    //check against the valid value
-    if (@$_GET['box'] !== "TOS") {
-        $errors['box'] = 'To join us, you need to agree to the TOS!';
-    }
+    if (!$TOS) {$errors['tos'] = 'To join us, you need to agree to the TOS!';}
 
-    //OTHER INPUTS
-    foreach($_GET as $input_name => $input_value) {
+    // Check other fields
+    foreach($_POST as $input_name => $input_value) {
 
-        // Check if all inputs are NOT completed
+        // NOT completed input
         if(empty($input_value) || !isset($input_value)) {
             
-
-            //for 2nd password input
-            $name = (strtolower($input_name) === "conf_password") ?  "PASSWORD" :  strtoupper($input_name);
-
-            // Add to errors array an error message for this input
-            $errors[$input_name] = " $name is required!";
+            // Show to user error
+            // Adapt error message for conf_password input
+            $inputToComplete = (strtolower($input_name) === "conf_password") ?  "PASSWORD" :  strtoupper($input_name);
+            $errors[$input_name] = " $inputToComplete is required!";
+            break;
         }
 
-        // In function of data its validity
+        // Specific validity for other inputs
+        // than TOS input
         switch ($input_name) {
-            // $input_name == username
+
             case "username":
-                // if it contains other characters than letters
-                //min 8 characters
-                if (strlen($_GET['username'])<8) {
-                    $errors['username'] = "Minimum 8 characters for username";
-                }
+                $usernameValue = $_POST[$input_name];
+                $USERNAME_LENGTH = strlen($usernameValue);
+                $usernameRegex = '/^[a-z0-9]$/i';
+                $invalidUsername = !preg_match($usernameRegex, $usernameValue);
 
-                if (!preg_match('/[a-z]/i', $_GET['username'])) {
-                    $errors['username'] = "Username can contain only letters";
-
-                }
-
+                // Temp: 8 character for user
+                if ($USERNAME_LENGTH < 8) { $errors[$input_name] = "Minimum 8 characters for $input_name"; }
                 break;
+
+                if ($invalidUsername) { $errors[$input_name] = "Only letters and numbers for username"; }
+                break;
+
             case "email":
-                //if it is not well-formed "blabla@.(thing)"
-                if (!filter_var($_GET['email'], FILTER_VALIDATE_EMAIL)) {
-                    $errors['email'] = "Invalid email format";
-                } else {
-                    $errors['email'] = "";
-                }
+                $emailValue = $_POST[$input_name];
+                $invalidEmailFormat = !filter_var($emailValue, FILTER_VALIDATE_EMAIL);
+
+                if ($invalidEmailFormat) { $errors[$input_name] = "Invalid $input_name format";}
                 break;
-            //Password1 same as Password 2 && length password min 8 
+
+            // Temp: Password limited to 8 characters min
             case 'password':
-                if (strlen($_GET['password']) < 8) {
-                    $errors['password'] = "Password is not enough strong";
-                }
+                $passwordValue = $_POST[$input_name];
+                $PASSWORD_LENGTH = strlen($passwordValue);
+                $confirmPasswordValue = $_POST['conf_password'];
 
-                if ($_GET['password']!==$_GET['conf_password']) {
-                    $errors['password'] = "Password must be the same";
-                }
-
+                if ($PASSWORD_LENGTH < 8) {$errors[$input_name] = "Not enough strong $input_name";}
                 break;
-            //Password1 same as Password 2 && length password min 8 
+
+                if ($passwordValue != $confirmPasswordValue) {$errors[$input_name] = "Password must be the same";}
+                break;
+
             case 'conf_password':
-                if (strlen($_GET['conf_password']) < 8) {
-                    $errors['conf_password'] = "Password is not enough strong";
-                }
+                $confirmPasswordValue = $_POST[$input_name];
+                $passwordValue = $_POST['password'];
+                $CONFIRM_PASSWORD_LENGTH = strlen($confirmPasswordValue);
+
+                if ($CONFIRM_PASSWORD_LENGTH < 8) {$errors[$input_name] = "Not enough strong password";}
+                break;
     
-                if ($_GET['conf_password']!==$_GET['conf_password']) {
-                    $errors['conf_password'] = "Password must be the same";
-                }
-    
+                if ($passwordValue !== $confirmPasswordValue) {$errors[$input_name] = "Password must be the same";}
                 break;
 
-                default:
-                    break;
+            default:
+                break;
 
         }
 
     }
 
+}
+
+
+// For TOS
+// Memorize value of checkbox
+function followUserDecision() {
+    $TOS = $_POST['tos'] ?? "";
+    if(isset($TOS) && !(empty($TOS))) echo "checked";
 }
