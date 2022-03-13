@@ -1,5 +1,5 @@
 <footer class="form-footer">
-  <p class="form-footer-message">&copy; First back-end project</p>
+  <p class="form-footer-message">Copyright 2021</p>
 </footer>
 </form>
 <!-- Import Bootstrap JS   -->
