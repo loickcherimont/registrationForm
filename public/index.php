@@ -24,7 +24,7 @@
 
 	<!-- Password -->
 	<p class='mb-3'>
-		<input type='password' name='password' id='password' placeholder='Passsword' value="<?= htmlspecialchars($_POST['password'] ?? '') ?>" class='form-control'>
+		<input type='password' name='password' id='password' placeholder='Password' value="<?= htmlspecialchars($_POST['password'] ?? '') ?>" class='form-control'>
 		<span class='text-danger'><?= $errors['password'] ?></span>
 	</p>
 
@@ -36,11 +36,11 @@
 
 	<!-- TOS -->
 	<p class='form-check'>
-		<input type='checkbox' name='tos' id='tos' value='TOS' class='form-check-input' <?php followUserDecision(); ?> > I agree to the <a class='text-success' href='javascript:void(0)'>Terms of Services</a> and <a class='text-success' href='#'>Privacy Policy</a>
+		<input type='checkbox' name='tos' id='tos' value='TOS' class='form-check-input' <?= keepUserDecision() ?> > I agree to the <a class='text-primary' href='javascript:void(0)'>Terms of Services</a> and <a class='text-primary' href='#'>Privacy Policy</a>
 		<span class='d-block text-danger'><?= $errors['tos'] ?></span>
 	</p>
 	<p class='d-flex justify-content-center mt-3'>
-		<input type='submit' name='submit' value='Create account' class='btn btn-success'>
+		<input type='submit' name='submit' value='Create account' class='btn btn-primary'>
 	</p>
 
 
