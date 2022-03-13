@@ -1,5 +1,5 @@
 <?php
-// No error at the beginning
+// No errors at the beginning
 $errors = [
     'username' => "",
     'email' => "",
@@ -8,86 +8,116 @@ $errors = [
     'tos' => ""
 ];
 
-// Submission
+$TOS = $_POST['tos'] ?? '';
+
+// When user send with POST method the datas
 if(isset($_POST) && !empty($_POST)) {
 
-    $TOS = $_POST['tos'] ?? '';
+    // Verify field by field
+    checkUsername();
+    checkEmail();
+    checkPasswords();
 
-    if (!$TOS) {$errors['tos'] = 'To join us, you need to agree to the TOS!';}
 
-    // Check other fields
-    foreach($_POST as $input_name => $input_value) {
-
-        // NOT completed input
-        if(empty($input_value) || !isset($input_value)) {
-            
-            // Show to user error
-            // Adapt error message for conf_password input
-            $inputToComplete = (strtolower($input_name) === "conf_password") ?  "PASSWORD" :  strtoupper($input_name);
-            $errors[$input_name] = " $inputToComplete is required!";
-            break;
-        }
-
-        // Specific validity for other inputs
-        // than TOS input
-        switch ($input_name) {
-
-            case "username":
-                $usernameValue = $_POST[$input_name];
-                $USERNAME_LENGTH = strlen($usernameValue);
-                $usernameRegex = '/^[a-z0-9]$/i';
-                $invalidUsername = !preg_match($usernameRegex, $usernameValue);
-
-                // Temp: 8 character for user
-                if ($USERNAME_LENGTH < 8) { $errors[$input_name] = "Minimum 8 characters for $input_name"; }
-                break;
-
-                if ($invalidUsername) { $errors[$input_name] = "Only letters and numbers for username"; }
-                break;
-
-            case "email":
-                $emailValue = $_POST[$input_name];
-                $invalidEmailFormat = !filter_var($emailValue, FILTER_VALIDATE_EMAIL);
-
-                if ($invalidEmailFormat) { $errors[$input_name] = "Invalid $input_name format";}
-                break;
-
-            // Temp: Password limited to 8 characters min
-            case 'password':
-                $passwordValue = $_POST[$input_name];
-                $PASSWORD_LENGTH = strlen($passwordValue);
-                $confirmPasswordValue = $_POST['conf_password'];
-
-                if ($PASSWORD_LENGTH < 8) {$errors[$input_name] = "Not enough strong $input_name";}
-                break;
-
-                if ($passwordValue != $confirmPasswordValue) {$errors[$input_name] = "Password must be the same";}
-                break;
-
-            case 'conf_password':
-                $confirmPasswordValue = $_POST[$input_name];
-                $passwordValue = $_POST['password'];
-                $CONFIRM_PASSWORD_LENGTH = strlen($confirmPasswordValue);
-
-                if ($CONFIRM_PASSWORD_LENGTH < 8) {$errors[$input_name] = "Not enough strong password";}
-                break;
-    
-                if ($passwordValue !== $confirmPasswordValue) {$errors[$input_name] = "Password must be the same";}
-                break;
-
-            default:
-                break;
-
-        }
-
+    if (!$TOS) {
+        $errors['tos'] = 'To join us, you need to agree to the TOS!'; 
     }
 
+
+    correctInputs();
 }
 
+// -- USEFUL FUNCTIONS
+function checkUsername() {
+
+    global $errors, $memberName;
+
+    $username = $_POST['username'];
+    $USERNAME_LENGTH = strlen($username);
+    $usernameRegex = '/^[a-z0-9]*$/i';
+    $invalidUsername = !preg_match($usernameRegex, $username);
+
+
+    if(!$username) {
+        $errors['username'] = 'Please, add an USERNAME';
+        return;
+    }
+
+    if ($USERNAME_LENGTH < 8) {
+        $errors['username'] = 'Minimum 8 characters for USERNAME'; 
+        return;
+    }
+
+    if ($invalidUsername) {
+        $errors['username'] = 'Only letters and numbers for USERNAME';
+        return;
+    }
+}
+
+function checkEmail() {
+
+    global $errors;
+
+    $email = $_POST['email'];
+    $invalidEmailFormat = !filter_var($email, FILTER_VALIDATE_EMAIL);
+
+    if(!$email) {
+        $errors['email'] = 'Please, add an EMAIL';
+        return;
+    }
+
+    if ($invalidEmailFormat) { 
+        $errors['email'] = 'Invalid EMAIL format';
+        return;
+    }
+}
+
+function checkPasswords() {
+
+    global $errors;
+
+    $password1 = $_POST['password'];
+    $password2 = $_POST['conf_password'];
+    $PASSWORD1_LENGTH = strlen($password1);
+ 
+    if (!$password1) {
+        $errors['password'] = 'Please, add a PASSWORD';
+        return;
+    }
+
+    if ($PASSWORD1_LENGTH < 8) {
+        $errors['password'] = "PASSWORD not enought strong";
+        return;
+    }
+
+    if ($password1 !== $password2) {
+        $errors['conf_password'] = 'The passwords entered do not match';
+    }
+}
 
 // For TOS
 // Memorize value of checkbox
-function followUserDecision() {
+function keepUserDecision() {
     $TOS = $_POST['tos'] ?? "";
-    if(isset($TOS) && !(empty($TOS))) echo "checked";
+    if(isset($TOS) && !empty($TOS)) {
+        return "checked";
+    }
+}
+
+// If all inputs are correctly completed
+function correctInputs() {
+
+    global $errors;
+
+    // Valid inputs
+    $noErrorUsername = !$errors['username'];
+    $noErrorEmail = !$errors['email'];
+    $noErrorPassword1 = !$errors['password'];
+    $noErrorPassword2 = !$errors['conf_password'];
+    $checkedTOS = !$errors['tos'];
+
+    if($noErrorUsername && $noErrorEmail && $noErrorPassword1 && $noErrorPassword2 && $checkedTOS) {
+        header("Location: http://localhost:8081/public/homepage.php");
+    }
+
 }
