@@ -117,7 +117,7 @@ function correctInputs() {
     $checkedTOS = !$errors['tos'];
 
     if($noErrorUsername && $noErrorEmail && $noErrorPassword1 && $noErrorPassword2 && $checkedTOS) {
-        header("Location: http://localhost:8081/public/homepage.php");
+        header("Location: http://registrationForm/public/homepage.php");
     }
 
 }
